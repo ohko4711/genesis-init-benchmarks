@@ -103,13 +103,9 @@ monitor_memory_usage() {
       continue
     fi
 
-    echo "[DEBUG] Memory usage raw output: $memory_usage"
-
     # Extract current memory usage and its unit
     current_memory=$(echo $memory_usage | awk '{print $1}' | sed 's/[^0-9.]//g')
     unit=$(echo $memory_usage | awk '{print $1}' | sed 's/[0-9.]//g')
-
-    echo "[DEBUG] Current memory: $current_memory, Unit: $unit"
 
     # Remove any commas from the number
     current_memory=$(echo $current_memory | sed 's/,//g')
@@ -125,11 +121,20 @@ monitor_memory_usage() {
       *) echo "[ERROR] Unknown unit: $unit" ;;
     esac
 
-    echo "[DEBUG] Converted memory in MB: $current_memory"
+    current_time=$(date +"%Y-%m-%d %H:%M:%S")
+    echo "[$current_time] [DEBUG] Read stored memory from file: $stored_memory"
+
+    if [ -f "$output_file" ]; then
+      stored_memory=$(cat "$output_file")
+    else
+      stored_memory=0
+    fi
 
     if (( $(echo "$current_memory > $max_memory_usage" | bc -l) )); then
       max_memory_usage=$current_memory
-      echo "$max_memory_usage" > "$output_file"
+      if (( $(echo "$max_memory_usage > $stored_memory" | bc -l) )); then
+        echo "$max_memory_usage" > "$output_file"
+      fi
     fi
     sleep $interval
   done &
@@ -241,6 +246,8 @@ for size in "${SIZES[@]}"; do
         python3 setup_node.py --client $client --image $image --second-start
       fi
 
+      echo "[DEBUG] Second start sleeping for 10 seconds..."
+      sleep 10
       check_initialization_completed $client "$log_entry"
       if [ $? -ne 0 ]; then
         echo "-1" > "$output_file"
