@@ -5,7 +5,7 @@ services:
     container_name: gas-execution-client
     image: ${EC_IMAGE_VERSION}
     environment:
-      - BESU_OPTS=-Xmx48g
+      - BESU_OPTS=-Xmx32g
     networks:
     - gas
     volumes:
