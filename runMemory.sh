@@ -222,9 +222,9 @@ for size in "${SIZES[@]}"; do
 
       check_initialization_completed $client "$log_entry"
       if [ $? -ne 0 ]; then
-        echo "-1" > "$output_file"
-        echo "[ERROR] Initialization check failed for client $client"
         stop_memory_monitor $memory_output_file
+        echo "[ERROR] Initialization check failed for client $client"
+        echo "-1" > "$output_file"
         continue
       fi
 
@@ -250,9 +250,9 @@ for size in "${SIZES[@]}"; do
       sleep 10
       check_initialization_completed $client "$log_entry"
       if [ $? -ne 0 ]; then
-        echo "-1" > "$output_file"
-        echo "[ERROR] Initialization check failed for client $client"
         stop_memory_monitor $memory_output_file
+        echo "[ERROR] Initialization check failed for client $client"
+        echo "-1" > "$output_file"
         continue
       fi
 
