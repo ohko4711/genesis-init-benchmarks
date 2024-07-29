@@ -91,14 +91,13 @@ monitor_memory_usage() {
   local interval=1
   local max_memory_usage=0
 
-  echo "-1" > "$output_file"
+  sleep 20
   echo "[INFO] Starting memory monitoring for $container_name..."
-
   while true; do
     memory_usage=$(docker stats --no-stream --format "{{.MemUsage}}" $container_name)
     
     if [ -z "$memory_usage" ]; then
-      echo "[ERROR] Failed to get memory usage for $container_name"
+      echo "[DEBUG] Failed to get memory usage for $container_name"
       sleep $interval
       continue
     fi
@@ -143,9 +142,7 @@ monitor_memory_usage() {
     sleep $interval
   done &
   monitor_pid=$!
-
   trap "kill $monitor_pid" EXIT
-
   echo "[INFO] Memory monitoring for $container_name with PID $monitor_pid started."
 }
 
@@ -223,7 +220,6 @@ for size in "${SIZES[@]}"; do
         echo "-1" > "$memory_output_file"
         continue
       fi
-
       stop_memory_monitor
 
       cd "scripts/$client"
@@ -251,7 +247,6 @@ for size in "${SIZES[@]}"; do
         echo "-1" > "$memory_output_file"
         continue
       fi
-
       stop_memory_monitor
 
       cd "scripts/$client"
