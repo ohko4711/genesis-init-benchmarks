@@ -118,7 +118,11 @@ monitor_memory_usage() {
       KiB) current_memory=$(echo "scale=2; $current_memory / 1024" | bc) ;;
       MiB) current_memory=$current_memory ;;
       GiB) current_memory=$(echo "scale=2; $current_memory * 1024" | bc) ;;
-      *) echo "[ERROR] Unknown unit: $unit" ;;
+      *) 
+        echo "[ERROR] Unknown unit: $unit"
+        echo -1 > "$output_file"
+        exit 1
+        ;;
     esac
 
     current_time=$(date +"%Y-%m-%d %H:%M:%S")
