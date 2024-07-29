@@ -90,8 +90,9 @@ monitor_memory_usage() {
   local output_file=$2
   local interval=1
   local max_memory_usage=0
+  local error_count=0
+  local max_errors=10
 
-  sleep 20
   echo "[INFO] Starting memory monitoring for $container_name..."
   while true; do
     memory_usage=$(docker stats --no-stream --format "{{.MemUsage}}" $container_name)
@@ -118,11 +119,19 @@ monitor_memory_usage() {
       MiB) current_memory=$current_memory ;;
       GiB) current_memory=$(echo "scale=2; $current_memory * 1024" | bc) ;;
       *) 
-        echo "[ERROR] Unknown unit: $unit"
-        echo -1 > "$output_file"
-        break
+        echo "[DEBUG] Unknown unit: $unit"
+        error_count=$((error_count + 1))
+        if [ $error_count -ge $max_errors ]; then
+          echo "[ERROR] Too many unknown unit errors. Exiting memory monitoring."
+          echo -1 > "$output_file"
+          break
+        else
+          sleep $interval
+          continue
+        fi
         ;;
     esac
+    error_count=0
 
     current_time=$(date +"%Y-%m-%d %H:%M:%S")
     echo "[$current_time] [DEBUG] Read stored memory from file: $stored_memory"
