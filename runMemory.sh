@@ -131,7 +131,7 @@ monitor_memory_usage() {
     if [ -f "$output_file" ]; then
       stored_memory=$(cat "$output_file")
     else
-      stored_memory=0
+      stored_memory=-1
     fi
 
     if (( $(echo "$current_memory > $max_memory_usage" | bc -l) )); then
@@ -150,15 +150,8 @@ monitor_memory_usage() {
 }
 
 stop_memory_monitor() {
-  local output_file=$1
-  echo "[INFO] Stopping memory monitoring..."
-
   kill $monitor_pid
   wait $monitor_pid 2>/dev/null
-
-  local max_memory_usage=$(awk 'BEGIN{max=0} {if($1>max) max=$1} END{print max}' "$output_file")
-  echo "$max_memory_usage" > "$output_file"
-  echo "[INFO] Max memory usage $max_memory_usage written to $output_file"
 }
 
 clean_up() {
@@ -208,11 +201,10 @@ for size in "${SIZES[@]}"; do
       clean_up
       cd ../..
 
+      memory_output_file="${OUTPUT_DIR}/${client}_${run}_first_${size}M.txt"
       if [[ "$client" == "nethermind" || "$client" == "besu" ]]; then
-        memory_output_file="${OUTPUT_DIR}/${client}_${run}_first_${size}M.txt"
         monitor_memory_usage "gas-execution-client" $memory_output_file
       else
-        memory_output_file="${OUTPUT_DIR}/${client}_${run}_first_${size}M.txt"
         monitor_memory_usage "gas-execution-client-sync" $memory_output_file
       fi
 
@@ -226,13 +218,13 @@ for size in "${SIZES[@]}"; do
 
       check_initialization_completed $client "$log_entry"
       if [ $? -ne 0 ]; then
-        stop_memory_monitor $memory_output_file
+        stop_memory_monitor
         echo "[ERROR] Initialization check failed for client $client"
-        echo "-1" > "$output_file"
+        echo "-1" > "$memory_output_file"
         continue
       fi
 
-      stop_memory_monitor $memory_output_file
+      stop_memory_monitor
 
       cd "scripts/$client"
       docker compose stop
@@ -254,13 +246,13 @@ for size in "${SIZES[@]}"; do
       sleep 10
       check_initialization_completed $client "$log_entry"
       if [ $? -ne 0 ]; then
-        stop_memory_monitor $memory_output_file
+        stop_memory_monitor
         echo "[ERROR] Initialization check failed for client $client"
-        echo "-1" > "$output_file"
+        echo "-1" > "$memory_output_file"
         continue
       fi
 
-      stop_memory_monitor $memory_output_file
+      stop_memory_monitor
 
       cd "scripts/$client"
       docker compose down --remove-orphans
