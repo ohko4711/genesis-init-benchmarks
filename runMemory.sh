@@ -121,7 +121,7 @@ monitor_memory_usage() {
       *) 
         echo "[ERROR] Unknown unit: $unit"
         echo -1 > "$output_file"
-        exit 1
+        break
         ;;
     esac
 
