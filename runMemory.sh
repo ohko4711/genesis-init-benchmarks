@@ -91,8 +91,9 @@ monitor_memory_usage() {
   local interval=1
   local max_memory_usage=0
   local error_count=0
-  local max_errors=10
+  local max_errors=100
 
+  echo -1 > "$output_file"
   echo "[INFO] Starting memory monitoring for $container_name..."
   while true; do
     memory_usage=$(docker stats --no-stream --format "{{.MemUsage}}" $container_name)
