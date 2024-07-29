@@ -223,6 +223,8 @@ for size in "${SIZES[@]}"; do
         python3 setup_node.py --client $client --image $image
       fi
 
+      echo "[DEBUG] First start sleeping for 10 seconds..."
+      sleep 10
       check_initialization_completed $client "$log_entry"
       if [ $? -ne 0 ]; then
         stop_memory_monitor
