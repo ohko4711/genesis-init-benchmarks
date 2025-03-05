@@ -1,7 +1,7 @@
 services:
   execution-init:
     user: "root:root"
-    container_name: gas-execution-client-init
+    container_name: gas-execution-client-sync
     image: ${EC_IMAGE_VERSION:-erigontech/erigon:v3.0.0-rc1}
     networks:
     - gas
