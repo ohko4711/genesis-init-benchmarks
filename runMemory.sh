@@ -253,6 +253,10 @@ for size in "${SIZES[@]}"; do
 
       echo "[DEBUG] Second start sleeping for 10 seconds..."
       sleep 10
+      if [ "$client" = "erigon" ]; then
+        log_entry="Initialised chain configuration"
+        echo "[DEBUG] For Client $client,second start log_entry is $log_entry"
+      fi
       check_initialization_completed $client "$log_entry"
       if [ $? -ne 0 ]; then
         stop_memory_monitor
