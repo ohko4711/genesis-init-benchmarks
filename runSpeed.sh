@@ -230,6 +230,12 @@ for size in "${SIZES[@]}"; do
 
       # second init
       start_time=$(($(date +%s%N) / 1000000))
+      case $client in
+      erigon) log_entry="Initialised chain configuration" ;;
+      geth) log_entry="Chain ID" ;;
+      reth) log_entry="Database opened" ;;
+      esac
+      echo "[DEBUG] For Client $client,second start log_entry is '$log_entry'"
       run_setup_and_initialization $client $image $run $size $output_file_second "$log_entry" $start_time true
 
     done
