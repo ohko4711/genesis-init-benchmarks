@@ -170,6 +170,15 @@ clean_up() {
   echo "[INFO] Cleanup completed."
 }
 
+# skips deleting execution-data so data persists for second start.
+container_clean() {
+  echo "[INFO] Cleaning up containers (preserving data)..."
+  docker stop gas-execution-client gas-execution-client-sync
+  docker rm gas-execution-client gas-execution-client-sync
+  docker container prune -f
+  echo "[INFO] Container cleanup completed."
+}
+
 for size in "${SIZES[@]}"; do
 
   echo "[INFO] Calculating new size for $size"
@@ -237,7 +246,7 @@ for size in "${SIZES[@]}"; do
 
       cd "scripts/$client"
       docker compose stop
-      clean_up
+      container_clean
       cd ../..
 
       memory_output_file="${OUTPUT_DIR}/${client}_${run}_second_${size}M.txt"
