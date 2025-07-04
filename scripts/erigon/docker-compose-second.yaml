@@ -17,6 +17,7 @@ services:
     - "8545:8545"
     - "8551:8551"
     command:
+    - --datadir=/var/lib/erigon
     - --private.api.addr=0.0.0.0:9090
     - --nat=any
     - --http
@@ -26,12 +27,10 @@ services:
     - --http.corsdomain=*
     - --http.api=web3,eth,net,engine
     - --txpool.disable
-    - --chain=${NETWORK:-holesky}
     - --authrpc.addr=0.0.0.0
     - --authrpc.port=8551
     - --authrpc.vhosts=*
     - --authrpc.jwtsecret=/tmp/jwt/jwtsecret
-    - --datadir=/var/lib/erigon
     - --healthcheck
     - --metrics
     - --metrics.addr=0.0.0.0
