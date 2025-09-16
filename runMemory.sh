@@ -66,7 +66,7 @@ check_initialization_completed() {
 
   log_retry_count=0
   echo "[INFO] Waiting for log entry: '$log_entry' in $container_name..."
-  until docker logs $container_name 2>&1 | grep -q "$log_entry"; do
+  until docker logs $container_name 2>&1 | grep -qi "$log_entry"; do
     sleep $log_wait_time
     log_retry_count=$((log_retry_count+1))
 
